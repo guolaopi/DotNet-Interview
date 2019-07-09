@@ -232,7 +232,7 @@ exec deltb '表名'
 
 
 ## Q：两个对象值相同x.equals(y)==true，但可能有不同的hash code，这个说法对吗？
-#### A：==比较地址，equals比较值*（等比地址Equals值）*。两个对象值相同则表示拥有相同的HashCode。
+#### A：==比较地址，equals比较值* （等比地址Equals值） *。两个对象值相同则表示拥有相同的HashCode。
 
 
 ## Q：进程和线程的区别？
