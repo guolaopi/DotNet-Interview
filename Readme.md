@@ -162,7 +162,7 @@ exec deltb '表名'
 
 ## Q：什么是串行化？
 
-#### A：将数据使用BinaryFormat从Stream保存到二进制文件，这种文件大小都是2的平方。
+#### A：将数据使用BinaryFormat从Stream保存到二进制文件，这种文件大小都是2的X次方。
 
 
 ## Q：用一个xml文件描述你自己？
@@ -433,7 +433,9 @@ order by id
             Console.WriteLine("Notified");
         }
 	   ```
+	   
 	   ManualResetEvent与AutoResetEvent区别是M需要手动调用M.Reset()重置等待
+
 	   4. 线程池（em.....暂时看不懂搜出来的东西）
 
 ## Q：redis大数据并发（例如秒杀活动，放到redis时并发怎么处理）？
