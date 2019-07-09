@@ -374,6 +374,7 @@ order by id
     _rwlock.ReleaseWriterLock(); //释放写锁
 	```
 3. 系统级别的：信号量（Semaphore），互斥（Mutex），事件(AutoResetEvent/ManualResetEvent) 。线程池
+
 	1. 信号量（Semaphore）：
 	   ```
 	    //当前允许同时访问线程数2; 最大允许数量=3 
