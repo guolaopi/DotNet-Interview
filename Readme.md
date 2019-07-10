@@ -78,7 +78,7 @@ A：SqlConnection连接数据库，SqlCommand执行sql语句，SQLDataAdapter查
 
 ## Q：什么是SQL注入，如何防止SQL注入攻击？
 
-A：代码没有过滤特殊字符时，在执行sql语句处填入';等之类的字符来截断sql语句后再输入要执行的sql语句（删表等）来对数据库进行攻击。可以使用SQLParameter(把所有参数当字符串而不是关键字来处理或)者ORM来避免。
+A：代码没有过滤特殊字符时，在执行sql语句处填入';等之类的字符来截断sql语句后再输入要执行的sql语句（删表等）来对数据库进行攻击。可以使用SQLParameter(把所有参数当字符串而不是关键字来处理)或者ORM来避免。
 
 
 ## Q：使用递归输出斐波那契数列，并输出第X项。
@@ -468,89 +468,160 @@ public class Entity
 如果是控制某个列的并发，将ConcurrencyCheck特性添加到实体需要控制并发的**非主键属性**上即可。
 
 
-## Q：数据库优化、索引、事务、视图、存储过程，全文检索，查询优化？
-A：
+## Q：什么是事务？
+A：数据库的一种机制，在开启事务之后的操作中（如果发生了业务异常）可以将数据库回滚到开启事务之前的状态。
 
 
-## Q：http 管道 httpmodule httphandle是做什么的？
+## Q：说说你知道的数据库优化方式？
 A：
+1. 建立索引
+2. 使用存储过程
+3. 使用视图
+4. 优化查询语句
+
+
+## Q：数据库索引使用需要注意什么？什么是视图？如何做查询优化？
+A：
+1. 一个表内索引最好不要太多，一般在主键和经常做where条件或者group by或者order by的列上创建索引，如果表数据太小索引反而会影响性能。
+2. 视图是由一张或多张表联合查询出的虚拟表，复杂查询使用视图来代替联表查询会提升性能。
+3. 查询语句优化一般尽量避免全表扫描，以下几点会全表扫描：
+	1. 使用null判断，会全表扫描。
+	2. <>(不等于)判断，会全表扫描。
+	3. 使用or，会全表扫描。
+	4. 左右模糊查询%xx%，会全表扫描。
+	5. 尽量使用exists代替in，in会全表扫描。
+	6. 尽量不要在where语句中判断运算后的结果，会全表扫描。
+
+## Q：什么是跨域？如何解决跨域问题？
+A：跨域是为了限制JS和Cookie只能访问同域名下的资源。解决可以使用CORS（Cross-Orign Resouces Sharing跨域资源共享），nuget有现成的包，原理是在HTTP报文头中添加标识来控制。比如：Access-Control-Allow:http://xx.com代表允许xx.com访问。
+
+
+## Q：Http管道模型是什么？HttpHandler是什么？HttpModule是什么？中间件是什么？
+A：
+1. Http管道模型是指一个请求一层一层达到action，然后再一层一层出去的过程像个管道一样。
+2. HttpHandle是ISAPI的aspnet_isapi.dll通过后缀名然后转发到不同的处理程序。比如.aspx会调用System.Web.UI.PageHandler处理页面。
+3. HttpModule是请求在管道中经过的模块，可以自行编写实现身份认证、过滤器等功能。
+4. 中间件类似于HttpModule，也是在请求在管道中经过的模块，区别是HttpModule基于事件（我是这么答的）。
 
 
 ## Q：堆栈区别？
-A：
+A：堆上存放引用类型数据，需要手动开辟内存空间（new的时候）。栈上存放值类型数据，不需要手动开辟内存空间。
 
 
 ## Q：数组是否值类型？
-A：
+A：数组都是引用类型，继承自System.Array，而Array继承自System.Object，众所周知值类型都是继承System.ValueType的。
 
 
 ## Q：数组扩展长度内存操作原理 ？
-A：
+A：(这个面试官问的我到现在还没有理解他想问什么？可能是想问List在Add时候的扩容过程)
+如果有人问**数组扩容**或者**List在Add时超出长度**在内存中的过程就回答：**如果新添加的元素超出数组长度则new一个更大的数组将原来数组copy过去。**
 
 
 ## Q：数组和集合区别 ？
-A：
+A：数组声明时是定长的，且声明类型比如int[5]，内存上是连续存储的。
+集合则可以一直添加元素，声明时不一定声明类型（使用泛型）比如List<object>。
 
 
-## Q：a=“123” b=“123”内存怎么分配，a=b时呢？
+## Q：a="123"; b="123";内存怎么分布，b=a时呢？
 A：
+1. “123”由于CLR的字符串驻留机制只存有一份。所以当a="123";b="123";时a和b都指向了"123"这个字符串的引用。
+2. 当b=a时是把a的引用copy了一份给b。
 
 
 ## Q：分布式锁原理？
-A：
+A：通过某种方式加一把锁，让分布式程序执行方法时获取锁，保证**同一个方法同一时刻只能被一台机器上的一个线程访问。**一般实现有：1. 通过数据库实现（加一条记录去读取之类的）。2. 通过redis实现。3. 通过Zookeeper（不知道是啥）。
 
 
 ## Q：redis五种数据类型？
 A：
+1. string
+2. hash
+3. list（值不唯一，可以通过pop实现简单消息队列）
+4. set（值唯一）
+5. zset
 
 
 ## Q：rabbitMQ中交换机的理解？
-A：
-
-
-## Q：抽象方法和virtual方法的区别？
-A：
+A：消息(Message)由Client发送，RabbitMQ接收到消息之后通过交换机转发到对应的队列上面。Worker会从队列中获取未被读取的数据处理。
+RabbitMQ包含四种不同的交换机类型：
+1. Direct exchange：直连交换机，转发消息到routigKey指定的队列
+2. Fanout exchange：扇形交换机，转发消息到所有绑定队列（速度最快）
+3. Topic exchange：主题交换机，按规则转发消息（最灵活）
+4. Headers exchange：首部交换机 (未接触)
+（抄的，只跑过收/发消息的demo）
 
 
 ## Q：const和readonly的区别？
-A：
+A：const是编译时定好无法改变的。readonly归根结底还是对象中的属性，是动态的，只不过修饰为只读而已。
 
 
 ## Q：扩展方法是动态还是静态？怎么写扩展方法？
-A：
+A：扩展方法是静态的，只能存在于静态类中。写法跟函数差不多，第一个参数必写为this 要扩展的类型 xxx，然后xxx则是调用扩展方法的对象本身，比如扩展一个string类的方法：
+```
+static void Output(this string str)
+{
+    Console.WriteLine(str);
+    //"123".Output(); 执行后会输出123，
+    //str对象就是调用方法的"123"字符串
+}
+```
 
 
 ## Q：IOC相关理解？
-A：
+A：接口IA定义业务方法，A具体实现IA。通过IOC将实现类A注入到IA中，这样调用时虽然看起来是IA.方法()，其实执行的是实现类中的方法。实现了面向接口编程，降低对实现类的耦合。
 
 
-## Q：DDD的理解和认识？
-A：
+## Q：DDD的理解和认识？什么是失血/贫血/充血/胀血模型？
+A：可以通过聚合、实体等概念梗清晰的描述业务，底层的CQRS（读写分离）、UOW（UnitOfWork，自动实现事务）、仓储层都很好用。
+1. 失血模型：领域模型只有get/set。没有任何实体业务逻辑，完全依赖service->DAL->domain调用。
+2. 贫血模型：领域模型除了get/set后包含一些简单的实体组装逻辑，还是依赖service->DAL->domain调用。
+3. 充血模型：领域模型包含DAL层的东西比如持久化，调用变为service->domain->DAL
+4. 胀血模型：取消service层，直接通过domain->DAL来调用执行业务
+（血越多领域层越复杂，对service层依赖越小）
 
 
 ## Q：.NET4.5 / 4.6以及历史版本的区别？
 A：
+- .NET 3.0 引入WPF、WCF、WF。使用CLR 2.0，对应C# 3.0；
+- .NET 3.5 引入Linq、EF、扩展方法、特性、Lambda。使用CLR 2.0，对应C# 3.0；
+- .NET 4.0 增加了并行的支持。使用CLR 4.0，对应C# 4.0；
+- .NET 4.5 增加了Task异步编程模型（async/await）。使用CLR 4.0，对应C# 5.0；
+- .NET 4.6 优化（好像同时发布/引入了ASP.NET Core）。使用CLR 4.0，对应C# 6.0；
+- .NET 4.6.2 对应C#7.0
 
 
 ## Q：SQL分页怎么实现？
 A：
+1. select top 页大小 from x where id not in(select top 页大小x(页码-1) id from x) 不推荐使用因为in会造成全表扫描。
+2. ```
+   select * from (
+   		select *,ROW_NUMBER() OVER(order by id) as RowId from x
+   	) as t
+   	where t.RowId between 页大小x(页码-1) and 页大小x页码
+   ```
 
 
-## Q：SQLPrameter的原理？
+## Q：SQLParameter的原理？
+A：把所有参数当字符串而不是关键字来处理。
+
+
+## Q：IIS应用程序池经典模式和集成模式区别？
 A：
-
-
-## Q：IIS应用程序池经典和继承的区别？
-A：
+- 经典模式：兼容IIS6.0，继续通过C盘下aspnet_isapi.dll来处理请求。
+- 集成模式：使用IIS和ASP.NET的集成请求处理管道来处理请求。
 
 
 ## Q：如何全局处理异常？
-A：
+A：使用中间件记录处理异常，或者使用ExceptionFilter来捕获全局异常。
 
 
 ## Q：说说Webapi的restful风格的了解？post和put的区别？
-A：
-
+A：对同一个接口地址通过不同的请求Method编写不同的逻辑。一般包括四种：
+1. get：查询
+2. post：添加
+3. put：更新
+4. delete：删除
+因为put一般代表更新操作，所以是幂等的，更新一万次对象还是存在。而post则不是幂等的，多次post会创建多个数据。
 
 ## Q：nuget包上传管理流程？
 A：
