@@ -597,7 +597,7 @@ A：
 - .NET 4.6.2 对应C#7.0
 
 
-## Q：SQL分页怎么实现？
+## Q：SqlServer使用SQL分页怎么实现？
 A：
 1. select top 页大小 from x where id not in(select top 页大小x(页码-1) id from x) 不推荐使用因为in会造成全表扫描。
 2. 
@@ -607,7 +607,16 @@ select * from (
 ) as t
 where t.RowId between 页大小x(页码-1) and 页大小x页码
 ```
-
+3. 
+```
+--支持SQLSERVER 2012+的版本
+SELECT DepartmentID, Name, GroupName  
+FROM HumanResources.Department  
+ORDER BY DepartmentID   
+    OFFSET 0 ROWS  
+    FETCH NEXT 10 ROWS ONLY;  
+```
+*感谢V2EX的@hihipp 补充*
 
 ## Q：SQLParameter的原理？
 A：把所有参数当字符串而不是关键字来处理。
