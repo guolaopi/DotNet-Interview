@@ -30,7 +30,7 @@ A：标记为sealed。
 
 ## Q：简单描述CLR?
 
-A：因为有了CLR的GC机制。正常情况下，.net会自动的帮忙释放内存,如果非托管代码，则需要手动释放，比如dataread、WebRequest。
+A：CLR(Common Language Runtime公共语言运行时)类似于java的JVM虚拟机。.NET平台的程序会运行在CLR上，CLR自动进行资源分配和垃圾回收，某种程度上分离了系统和应用。
 
 
 ## Q：如何对数组的元素进行倒序排列？
@@ -96,7 +96,7 @@ int fb(int i)
 
 ## Q：将字符串www.abc.com逆序输出为”com.abc.www”。
 
-A：str.Split('.').Sort().Reverse()
+A：Console.WriteLine(string.Join(".", str.Split(".").Reverse()));
 
 
 ## Q：原生js的ajax？
@@ -170,9 +170,9 @@ A：将数据使用BinaryFormat从Stream保存到二进制文件，这种文件�
 A：
 ```
 <me>
-	<name>姓名</name>
-	<sex>男</sex>
-	<age>24</age>
+    <name>姓名</name>
+    <sex>男</sex>
+    <age>24</age>
 </me>
 ```
 
@@ -220,7 +220,7 @@ A：IEnumerable接口、GetEnumerator()方法
 
 
 ## Q：GC是什么？为什么需要GC？
-A：GC（Garbage Collector）是垃圾收集器。.net中垃圾收集器会自动对内存垃圾进行回收管理。
+A：GC（Garbage Collector）是垃圾收集器。.net中垃圾收集器会自动对内存垃圾进行回收管理，因为有了CLR的GC机制。正常情况下，.net会自动的帮忙释放内存,如果非托管代码，则需要手动释放，比如dataread、WebRequest。
 
 
 ## Q：接口可否继承接口？抽象类可否实现接口？抽象类可否继承实体类？
