@@ -610,9 +610,9 @@ where t.RowId between 页大小x(页码-1) and 页大小x页码
 3. 
 ```
 --支持SQLSERVER 2012+的版本
-SELECT DepartmentID, Name, GroupName  
-FROM HumanResources.Department  
-ORDER BY DepartmentID   
+SELECT *  
+FROM x  
+ORDER BY id   
     OFFSET 页大小x(页码-1) ROWS  --有点像Linq的Skip(x)
     FETCH NEXT 页大小 ROWS ONLY;  --然后Take(x)
 ```
