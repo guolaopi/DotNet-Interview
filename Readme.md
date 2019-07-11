@@ -613,8 +613,8 @@ where t.RowId between 页大小x(页码-1) and 页大小x页码
 SELECT DepartmentID, Name, GroupName  
 FROM HumanResources.Department  
 ORDER BY DepartmentID   
-    OFFSET 0 ROWS  
-    FETCH NEXT 10 ROWS ONLY;  
+    OFFSET 页大小x(页码-1) ROWS  --有点像Linq的Skip(x)
+    FETCH NEXT 页大小 ROWS ONLY;  --然后Take(x)
 ```
 *感谢V2EX的@hihipp 补充*
 
