@@ -648,3 +648,96 @@ A：
 3. 登录nuget官网创建一个密钥
 4. cmd命令：nuget push x.nupkg 密钥 -Source https://api.nuget.org/v3/index.json
 5. 上传完成，可在VS中搜索到
+
+
+## Q：简述.NET CORE中IOC生命周期？
+A：
+1. **Transient(瞬间的)：**每次使用（获取这个服务的时候）时都会创建新的服务，适合轻量级的服务。
+2. **Scoped(作用域的)：**在同一次请求中只存在一次的服务。
+3. **Singleton(唯一的/单例的)：**全局只创建一次的服务,第一次被请求的时候被创建,然后就一直使用同一个。
+
+
+## Q：简述.net core中间件？
+A：中间件是在管道中处理请求的组件，处理完后可以传递给下一个组件。通过在Startup类的Configure方法中使用Use来使用中间件并可以调整顺序。
+.NET CORE中使用RequestDelegate来构建管道模型，所以自定义的中间件需要根据约定来实现，注意有三点：
+1. 中间件内要定义一个只读的RequestDelegate类型的变量作为调用下一个中间件的委托。
+2. 构造函数中要定义RequestDelegate类型的参数并赋给类里的变量，IOC会将请求注入进来。
+3. 定义一个Task类型的名为Invoke的函数，参数为HttpContext，在其中写中间件的逻辑，并在最后记得返回类中的RequestDelegate对象，传递HttpContext。.NET CORE会自动执行Invoke方法。
+```
+public class RequestCultureMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public RequestCultureMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public Task Invoke(HttpContext context)
+        {
+        	//Todo...在这里可以对请求的上下文做操作如验证之类
+            //调用管道中的下一个中间件，向下传递
+            return this._next(context);
+        }
+    }
+```
+
+
+## Q：sql行转列，实现效果如下的操作？
+数据表：
+
+| name | subject | score |
+| :------| :------ | :------ |
+| 张三 | 语文 | 80 |
+| 张三 | 数学 | 70 |
+| 张三 | 英语 | 60 |
+| 李四 | 语文 | 90 |
+| 李四 | 数学 | 80 |
+| 李四 | 英语 | 70 |
+
+转换为：
+| name | 语文 | 数学 | 英语 |
+| :------| :------ | :------ | :------ |
+| 张三 | 80 | 70 | 60 |
+| 李四 | 90 | 80 | 70 |
+
+A：SqlServer中有PIVOT(旋转)关键字,PIVOT 后跟一个聚合函数来拿到结果，FOR 后面跟的科目是我们要转换的列（列转行使用UNPIVOT）：
+```
+SELECT *
+FROM t
+PIVOT (
+    SUM(score) FOR subject IN (语文, 数学, 英语)
+)
+--SqlServer 2005+的版本
+```
+
+附一个MySql版本：
+```
+SELECT
+	name
+    SUM(IF(cource="语文", score, 0)) AS "语文",
+    SUM(IF(cource="数学", score, 0)) AS "数学",
+    SUM(IF(cource="英语", score, 0)) AS "英语"
+FROM
+    t
+GROUP BY name
+```
+
+
+## Q：sql group分组，having怎么用？
+A：跟在Group后面，像where一样使用，来筛选分组后的数据。比如：
+```
+select sum(score) as s, name from x group by name having sum(score)>200
+--根据姓名分组后计算总分，并筛选总分大于200分的数据
+```
+
+
+## Q：去除字符串中连续空格，多个空格变为一个？
+A：使用正则匹配之后替换：
+```
+str = Regex("[\\s]+").Replace(str, " ");
+```
+
+
+## Q：泛型的内部机制？
+A：以List<T>为例，第一次编译时只是为T生成一个占位符。在实际用到时比如List<User>时，JIT(Just-In-Time即时编译器)会用User去代替T的占位符实例化User，以此来实现泛型。
